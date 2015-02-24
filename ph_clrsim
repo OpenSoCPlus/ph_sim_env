@@ -1,0 +1,58 @@
+#!/bin/bash
+
+#############################################
+#
+#  SCRIPT NAME   : ph_clrsim
+#  AUTHOR        : JoonSoo Ha
+#  REVISION      : 0.1
+#  RECENT UPDATE : 2014.12.16
+#  DESCRIPTION 
+#
+#############################################
+echo "======================"
+echo "     ph_clrsim        "
+echo "======================"
+
+
+#############################################
+#
+#  CHECK EXECUTION PATH 
+#
+#############################################
+if [[ ! -d ../../design ]]
+then
+	echo "Wrong execution path"
+	exit
+fi
+
+
+#############################################
+#
+#  CONFIRM QUESTION
+#
+#############################################
+echo -e "If u Really want to clear sim, write 'y') : \c"
+read ANS
+
+if [[ $ANS != "y" ]]
+then
+	echo "Quit"
+	exit
+fi
+
+
+#############################################
+#
+#  CLEAR SIM OUTPUT 
+#
+#############################################
+echo "Clear simulation output ..." 
+
+find ./log          -type f ! -name 'README.md' -exec rm {} \;
+find ./dump         -type f ! -name 'README.md' -and ! -name *.do -exec rm {} \;
+find ./sim/modelsim -type f ! -name 'README.md' -exec rm {} \;
+rm   -rf ./sim/modelsim/work
+
+echo "Clear simulation output ... done"
+
+

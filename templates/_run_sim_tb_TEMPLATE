@@ -1,0 +1,23 @@
+#!/bin/bash
+
+if [[ -d ./sim/modelsim/work ]]
+then
+	rm -r ./sim/modelsim/work
+fi
+
+vlib ./sim/modelsim/work
+
+vlog -work sim/modelsim/work \
+     ./testbench/tb_@TOP_MODULE@.v \
+     -f ./rtl/rtl.f
+
+vsim -c \
+     -lib ./sim/modelsim/work \
+     -do ./scr/sim_tb_@TOP_MODULE@.do 
+
+rm ./transcript
+
+
+vcd2wlf ./dump/sim_tb_@TOP_MODULE@.vcd \
+        ./dump/sim_tb_@TOP_MODULE@.wlf
+

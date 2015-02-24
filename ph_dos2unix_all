@@ -1,0 +1,63 @@
+#!/bin/bash
+
+#############################################
+#
+#  SCRIPT NAME   : ph_dos2unix_all
+#  AUTHOR        : JoonSoo Ha
+#  REVISION      : 0.1
+#  RECENT UPDATE : 2014.12.17
+#  DESCRIPTION 
+#
+#   Before run this script, 
+#   you have to modify this file using dos2unix
+#
+#############################################
+echo "======================"
+echo "    ph_dos2unix_all   "
+echo "======================"
+
+
+#############################################
+#
+#  CHECK EXECUTION PATH 
+#
+#############################################
+if [[ ! -d design || ! -d sim_env ]]
+then
+	echo "Wrong execution path"
+	exit
+fi
+
+
+#############################################
+#
+#  CONFIRM QUESTION
+#
+#############################################
+echo -e "If u Really want to do ph_dos2unix_all, write 'y') : \c"
+read ANS
+
+if [[ $ANS != "y" ]]
+then
+	echo "Quit"
+	exit
+fi
+
+
+#############################################
+#
+#  CONVERT FILES 
+#
+#############################################
+echo "Convert files ..." 
+
+dos2unix       README.md
+dos2unix       contributors.txt
+find ./sim_env       -type f ! -name '*.swp' -and ! -name 'ph_dos2unix_all' -exec dos2unix {} \;
+find ./design        -type f ! -name '*.swp' -exec dos2unix {} \;
+find ./etc           -type f ! -name '*.swp' -exec dos2unix {} \;
+find ./reference     -type f ! -name '*.swp' -exec dos2unix {} \;
+
+echo "Convert files ... done"
+
+

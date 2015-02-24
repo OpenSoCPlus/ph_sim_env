@@ -1,0 +1,145 @@
+#!/bin/bash
+
+#############################################
+#
+#  SCRIPT NAME   : ph_addmod
+#  AUTHOR        : JoonSoo Ha
+#  REVISION      : 0.1
+#  RECENT UPDATE : 2014.12.16
+#  DESCRIPTION 
+#
+#############################################
+echo "======================"
+echo "     ph_addmod        "
+echo "======================"
+
+
+#############################################
+#
+#  CHECK EXECUTION PATH 
+#
+#############################################
+CUR_DIR=`pwd`
+CUR_DIR=${CUR_DIR##/*/}
+
+if [[ ! -d ../sim_env || $CUR_DIR != "design" ]]
+then
+	echo "Wrong execution path"
+	exit
+fi
+
+
+#############################################
+#
+#  WRITE MODULE NAME 
+#
+#############################################
+echo -e "Write module name (if u want to quit, write 'q') : \c"
+read -a ANS_ARR
+
+MOD_NAME=${ANS_ARR[0]}
+
+if [[ $MOD_NAME == "q" ]]
+then
+	echo "Quit"
+	exit
+fi
+
+
+#############################################
+#
+#  GENERATE DIRECTORIES
+#
+#############################################
+if [[ -d ${MOD_NAME} ]]
+then 
+	echo "${MOD_NAME} is existing directory"
+    exit
+else
+    echo "Generate simulation directories ..." 
+
+	mkdir ${MOD_NAME}
+	mkdir ${MOD_NAME}/doc
+	mkdir ${MOD_NAME}/dump
+	mkdir ${MOD_NAME}/fpga
+	mkdir ${MOD_NAME}/log
+	mkdir ${MOD_NAME}/rtl
+	mkdir ${MOD_NAME}/scr
+	mkdir ${MOD_NAME}/sim
+	mkdir ${MOD_NAME}/sim/modelsim
+	mkdir ${MOD_NAME}/testbench
+
+	echo "README" > ${MOD_NAME}/README.md
+	echo "README" > ${MOD_NAME}/doc/README.md
+	echo "README" > ${MOD_NAME}/dump/README.md
+	echo "README" > ${MOD_NAME}/fpga/README.md
+	echo "README" > ${MOD_NAME}/log/README.md
+	echo "README" > ${MOD_NAME}/rtl/README.md
+	echo "README" > ${MOD_NAME}/scr/README.md
+	echo "README" > ${MOD_NAME}/sim/README.md
+	echo "README" > ${MOD_NAME}/sim/modelsim/README.md
+	echo "README" > ${MOD_NAME}/testbench/README.md
+
+	echo "Generate simulation directories ... done"
+fi
+
+
+#############################################
+#
+# GENERATE SCRIPT FILES
+#
+#############################################
+echo "Generate script files ..."
+
+TEMPLATES_PATH="../sim_env/templates"
+
+sed "s/@TOP_MODULE@/${MOD_NAME}_TOP/g" \
+    ${TEMPLATES_PATH}/_run_sim_tb_TEMPLATE \
+    > ${MOD_NAME}/_run_sim_tb_${MOD_NAME}_TOP 
+
+sed "s/@TOP_MODULE@/${MOD_NAME}_TOP/g" \
+    ${TEMPLATES_PATH}/sim_tb_TEMPLATE.do \
+    > ${MOD_NAME}/scr/sim_tb_${MOD_NAME}_TOP.do
+
+echo "Generate script files ... done"
+
+
+#############################################
+#
+# GENERATE TOP RTL TEMPLATE
+#
+#############################################
+echo "Generate top rtl template"
+
+echo -e "Write author name : \c"
+read RTL_AUTHOR
+
+sed -e "s/@TOP_MODULE@/${MOD_NAME}_TOP/g" \
+    -e "s/@AUTHOR@/${RTL_AUTHOR}/g" \
+       ${TEMPLATES_PATH}/RTL_TOP_TEMPLATE.v \
+       > ${MOD_NAME}/rtl/${MOD_NAME}_TOP.v
+
+RTL_LIST="./rtl/"${MOD_NAME}"_TOP.v"
+echo $RTL_LIST > ${MOD_NAME}/rtl/rtl.f 
+
+echo "Generate top rtl template ... done"
+
+
+#############################################
+#
+# GENERATE TOP TESTBENCH TEMPLATE
+#
+#############################################
+echo "Generate top testbench template"
+
+echo -e "Write author name : \c"
+read TB_AUTHOR
+
+sed -e "s/@TOP_MODULE@/${MOD_NAME}_TOP/g" \
+    -e "s/@AUTHOR@/${TB_AUTHOR}/g" \
+       ${TEMPLATES_PATH}/TB_TOP_TEMPLATE.v \
+       > ${MOD_NAME}/testbench/tb_${MOD_NAME}_TOP.v
+
+echo "Generate top testbench template ... done"
+
+
